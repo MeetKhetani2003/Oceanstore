@@ -24,14 +24,13 @@ export function MobileMenu() {
           transition={{ duration: 0.3, ease: EASE_PREMIUM }}
         >
           <div className="container-x flex h-16 items-center justify-between">
-            <div className="flex items-center gap-2.5 text-ocean-900">
-              <span className="grid h-9 w-9 place-items-center rounded-xl bg-gradient-to-br from-ocean-700 to-ocean-950">
-                <LogoMark className="h-5 w-5 text-leaf-300" />
-              </span>
-              <span className="text-[18px] font-semibold tracking-[0.34em]">
-                {BRAND.name}
-              </span>
-            </div>
+            <a href="/" onClick={closeMenu} className="flex items-center">
+              <img
+                src="/WhatsApp_Image_2026-06-14_at_12.33.31_PM-removebg-preview.png"
+                alt="OCEON"
+                className="h-10 w-auto object-contain"
+              />
+            </a>
             <button
               type="button"
               aria-label="Close menu"
