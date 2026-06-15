@@ -23,7 +23,7 @@ export function MobileMenu() {
           exit={{ opacity: 0 }}
           transition={{ duration: 0.3, ease: EASE_PREMIUM }}
         >
-          <div className="container-x flex h-16 items-center justify-between">
+          <div className="container-x w-full flex h-16 items-center justify-between">
             <a href="/" onClick={closeMenu} className="flex items-center">
               <img
                 src="/WhatsApp_Image_2026-06-14_at_12.33.31_PM-removebg-preview.png"
@@ -42,7 +42,7 @@ export function MobileMenu() {
           </div>
 
           <motion.nav
-            className="container-x mt-6 flex flex-1 flex-col gap-1"
+            className="container-x w-full mt-6 flex flex-1 flex-col gap-1"
             initial="hidden"
             animate="show"
             variants={{
@@ -71,7 +71,7 @@ export function MobileMenu() {
             ))}
           </motion.nav>
 
-          <div className="container-x pb-10 pt-4">
+          <div className="container-x w-full pb-10 pt-4">
             <a
               href={WHATSAPP_URL}
               className="flex h-13 w-full items-center justify-center gap-2.5 rounded-full bg-leaf-600 py-[14px] text-[15px] font-medium text-white transition-colors hover:bg-leaf-700"
