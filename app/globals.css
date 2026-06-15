@@ -1,0 +1,118 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI",
+    Roboto, Helvetica, Arial, sans-serif;
+  --font-display: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI",
+    Roboto, Helvetica, Arial, sans-serif;
+
+  --ease-premium: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* Neutrals — modern q-commerce clean white */
+  --color-ink: #111827;
+  --color-ink-2: #374151;
+  --color-muted: #6b7280;
+  --color-cream: #ffffff;
+  --color-cream-50: #ffffff;
+  --color-cream-100: #f3f4f6;
+  --color-sand: #f9fafb;
+  --color-line: #e5e7eb;
+
+  /* Primary — Vibrant OCEON Blue (from logo) */
+  --color-ocean-50: #eff6ff;
+  --color-ocean-100: #dbeafe;
+  --color-ocean-200: #bfdbfe;
+  --color-ocean-300: #93c5fd;
+  --color-ocean-400: #60a5fa;
+  --color-ocean-500: #0a64e3;
+  --color-ocean-600: #2563eb;
+  --color-ocean-700: #1d4ed8;
+  --color-ocean-800: #1e40af;
+  --color-ocean-900: #1e3a8a;
+  --color-ocean-950: #0f172a;
+
+  /* Accent — Vibrant Grocery Green (from logo leaf/apple) */
+  --color-leaf-50: #f0fdf4;
+  --color-leaf-100: #dcfce7;
+  --color-leaf-200: #bbf7d0;
+  --color-leaf-300: #86efac;
+  --color-leaf-400: #4ade80;
+  --color-leaf-500: #00b562;
+  --color-leaf-600: #059669;
+  --color-leaf-700: #047857;
+  --color-leaf-800: #065f46;
+
+  --radius-4xl: 1.5rem;
+  --radius-5xl: 2rem;
+}
+
+@layer base {
+  *,
+  ::before,
+  ::after {
+    border-color: var(--color-line);
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background-color: var(--color-cream-100);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    font-optical-sizing: auto;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5 {
+    font-optical-sizing: auto;
+    font-weight: 700;
+    letter-spacing: -0.025em;
+  }
+
+  ::selection {
+    background: var(--color-ocean-500);
+    color: #fff;
+  }
+
+  body::-webkit-scrollbar {
+    width: 6px;
+  }
+  body::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  body::-webkit-scrollbar-thumb {
+    background: #e5e7eb;
+    border-radius: 999px;
+  }
+  body::-webkit-scrollbar-thumb:hover {
+    background: #d1d5db;
+  }
+}
+
+@utility glass {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+@utility container-x {
+  margin-inline: auto;
+  max-width: 84rem;
+  padding-inline: clamp(1.25rem, 4vw, 2.5rem);
+}
+
+/* Anchor offsets so the fixed header never covers section tops */
+section[id],
+div[id] {
+  scroll-margin-top: 5.5rem;
+}

@@ -1,0 +1,33 @@
+export async function register() {
+  if (process.env.NEXT_RUNTIME === "nodejs") {
+    const cron = await import("node-cron");
+    const {
+      runReservationCleanup,
+      runLowStockMonitor,
+      runEmailRetry,
+      runSessionCleanup,
+    } = await import("@/lib/jobs/jobs");
+
+    // Every minute: clean up expired stock reservations
+    cron.schedule("* * * * *", () => {
+      runReservationCleanup();
+    });
+
+    // Every hour: monitor low stock and send alerts
+    cron.schedule("0 * * * *", () => {
+      runLowStockMonitor();
+    });
+
+    // Every 30 minutes: retry failed emails
+    cron.schedule("*/30 * * * *", () => {
+      runEmailRetry();
+    });
+
+    // Daily at 2am: clean up expired sessions
+    cron.schedule("0 2 * * *", () => {
+      runSessionCleanup();
+    });
+
+    console.log("[Scheduler] Background jobs initialized");
+  }
+}
