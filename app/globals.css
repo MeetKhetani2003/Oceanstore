@@ -66,6 +66,7 @@
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
     font-optical-sizing: auto;
+    overflow-x: hidden;
   }
 
   h1,

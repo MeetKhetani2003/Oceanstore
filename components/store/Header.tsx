@@ -80,14 +80,14 @@ export function Header() {
         </div>
 
         {/* Center: Q-Commerce Style Prominent Search Bar */}
-        <div className="flex-1 max-w-xl">
+        <div className="flex-1 max-w-xl min-w-0">
           <button
             type="button"
             onClick={openSearch}
-            className="flex w-full items-center gap-3 rounded-xl border border-line bg-sand px-4 py-2.5 text-left text-muted/70 transition-all duration-200 hover:border-gray-300 hover:bg-white hover:shadow-sm"
+            className="flex w-full items-center gap-2 md:gap-3 rounded-xl border border-line bg-sand px-3 py-2.5 md:px-4 text-left text-muted/70 transition-all duration-200 hover:border-gray-300 hover:bg-white hover:shadow-sm"
           >
-            <Search className="h-4.5 w-4.5 shrink-0 text-muted/60" />
-            <span className="text-[13.5px] font-normal truncate">
+            <Search className="h-4 w-4 md:h-4.5 md:w-4.5 shrink-0 text-muted/60" />
+            <span className="text-[13px] md:text-[13.5px] font-normal truncate min-w-0">
               Search for "fresh milk", "farm eggs", "wheat bread" ...
             </span>
           </button>
