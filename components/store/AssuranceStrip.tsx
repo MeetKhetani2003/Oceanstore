@@ -11,6 +11,7 @@ const items = [
 ];
 
 
+
 export function AssuranceStrip() {
   return (
     <section className="border-b border-line/70 bg-cream-50">
