@@ -21,12 +21,7 @@ const nextConfig: NextConfig = {
     },
   },
   serverExternalPackages: ["pdfkit", "fontkit", "restructure", "iconv-lite"],
-  webpack: (config, { dev }) => {
-    if (dev) {
-      config.cache = false;
-    }
-    return config;
-  },
+  turbopack: {},
   async headers() {
     return [
       {
