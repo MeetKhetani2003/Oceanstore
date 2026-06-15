@@ -47,7 +47,6 @@ const CategorySchema = new Schema<ICategory>(
   { timestamps: true }
 );
 
-CategorySchema.index({ slug: 1 }, { unique: true });
 CategorySchema.index({ order: 1 });
 CategorySchema.index({ isActive: 1 });
 

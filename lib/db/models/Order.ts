@@ -196,7 +196,6 @@ OrderSchema.pre("save", async function (next) {
 });
 
 OrderSchema.index({ user: 1, createdAt: -1 });
-OrderSchema.index({ orderNumber: 1 }, { unique: true });
 OrderSchema.index({ status: 1 });
 OrderSchema.index({ "payment.razorpayOrderId": 1 });
 OrderSchema.index({ "payment.razorpayPaymentId": 1 });

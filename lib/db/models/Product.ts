@@ -143,7 +143,6 @@ const ProductSchema = new Schema<IProduct>(
 );
 
 // Indexes
-ProductSchema.index({ slug: 1 }, { unique: true });
 ProductSchema.index({ category: 1 });
 ProductSchema.index({ tab: 1 });
 ProductSchema.index({ isActive: 1 });

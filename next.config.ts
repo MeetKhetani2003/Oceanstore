@@ -20,6 +20,7 @@ const nextConfig: NextConfig = {
       bodySizeLimit: "10mb",
     },
   },
+  serverExternalPackages: ["pdfkit", "fontkit", "restructure", "iconv-lite"],
   webpack: (config, { dev }) => {
     if (dev) {
       config.cache = false;
