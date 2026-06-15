@@ -1,78 +1,111 @@
 'use client';
 
-import React from 'react';
-import { motion } from 'framer-motion';
-import { Clock, Leaf, ShieldCheck, Award, ChevronRight } from 'lucide-react';
+import React, { useRef } from 'react';
+import { motion, useInView } from 'framer-motion';
+import { Clock, Leaf, ShieldCheck, Award, Zap, Truck } from 'lucide-react';
+import Link from 'next/link';
 
-const fadeUp = {
-  hidden: { opacity: 0, y: 30 },
-  visible: { 
-    opacity: 1, 
-    y: 0, 
-    transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] as any } 
-  }
-};
-
-const staggerContainer = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.15
-    }
-  }
-};
-
-const TRUST_FEATURES = [
-  { icon: Clock, title: 'Impeccable Timing', desc: 'Precision delivery within your chosen window, every time.' },
-  { icon: Leaf, title: 'Peak Freshness', desc: 'Sourced directly, stored perfectly, delivered at peak condition.' },
-  { icon: ShieldCheck, title: 'Curated Quality', desc: 'Every item is inspected to meet our exacting standards.' },
-  { icon: Award, title: 'Fair Value', desc: 'Premium quality without the excessive markup.' },
+const PILLARS = [
+  {
+    icon: Zap,
+    title: '15-Minute Delivery',
+    desc: 'Our dark stores are strategically placed so your order reaches you faster than ever.',
+    stat: '98%',
+    statLabel: 'on-time rate',
+    color: '#1E4D2B',
+  },
+  {
+    icon: Leaf,
+    title: 'Farm to Doorstep',
+    desc: 'We partner directly with certified organic farms. No middlemen, no mystery.',
+    stat: '100%',
+    statLabel: 'organic sourced',
+    color: '#0A192F',
+  },
+  {
+    icon: ShieldCheck,
+    title: 'Quality Guarantee',
+    desc: 'Every product passes a 12-point quality inspection before it enters our warehouse.',
+    stat: '12-pt',
+    statLabel: 'quality check',
+    color: '#7C4A1E',
+  },
+  {
+    icon: Award,
+    title: 'Fair Value Promise',
+    desc: 'Premium quality shouldn\'t cost a premium. We keep margins honest and prices fair.',
+    stat: '30%',
+    statLabel: 'avg. savings vs retail',
+    color: '#4A1E7C',
+  },
 ];
 
 export const TrustSection = () => {
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: true, margin: '-60px' });
+
   return (
-    <section id="our-standards" className="py-24 md:py-32 bg-ocean-blue text-white">
-      <div className="max-w-[1600px] mx-auto px-6 md:px-12">
-        <motion.div 
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-          variants={staggerContainer}
-          className="grid grid-cols-1 lg:grid-cols-12 gap-16 lg:gap-8 items-center"
-        >
-          <div className="lg:col-span-5">
-            <motion.h2 variants={fadeUp} className="editorial-font text-4xl md:text-5xl lg:text-6xl mb-6 leading-tight">
+    <section id="our-standards" className="py-24 md:py-36 bg-ocean-blue text-white overflow-hidden">
+      <div className="max-w-[1600px] mx-auto px-6 md:px-12" ref={ref}>
+
+        {/* Top: headline + intro */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 mb-20 items-end">
+          <div>
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={isInView ? { opacity: 1 } : {}}
+              className="text-xs uppercase tracking-widest text-white/40 font-semibold mb-4"
+            >
+              Our Standards
+            </motion.p>
+            <motion.h2
+              initial={{ opacity: 0, y: 24 }}
+              animate={isInView ? { opacity: 1, y: 0 } : {}}
+              transition={{ duration: 0.7 }}
+              className="editorial-font text-5xl md:text-6xl lg:text-7xl leading-tight"
+            >
               Why Families<br />Trust OCEON
             </motion.h2>
-            <motion.p variants={fadeUp} className="text-white/70 text-lg max-w-md font-light leading-relaxed mb-10">
-              We approach grocery delivery with the precision of a technology company and the passion of an artisan market. No compromises.
-            </motion.p>
-            <motion.button variants={fadeUp} className="flex items-center space-x-2 text-sm font-medium border-b border-white pb-1 hover:text-white/70 hover:border-white/70 transition-all">
-              <span>Read our Quality Manifesto</span>
-              <ChevronRight size={16} />
-            </motion.button>
           </div>
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={isInView ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.7, delay: 0.2 }}
+            className="text-white/60 text-lg md:text-xl font-light leading-relaxed max-w-lg"
+          >
+            We built OCEON with one principle: a family should never have to choose between quality and affordability. Every decision we make reflects that.
+          </motion.p>
+        </div>
 
-          <div className="lg:col-span-6 lg:col-start-7 grid grid-cols-1 sm:grid-cols-2 gap-12">
-            {TRUST_FEATURES.map((feature, idx) => {
-              const Icon = feature.icon;
-              return (
-                <motion.div key={idx} variants={fadeUp} className="flex flex-col">
-                  <div className="w-12 h-12 rounded-xl bg-white/10 flex items-center justify-center mb-6">
-                    <Icon size={24} className="text-warm-white" strokeWidth={1.5} />
-                  </div>
-                  <h3 className="text-xl font-medium mb-3">{feature.title}</h3>
-                  <p className="text-white/60 font-light leading-relaxed">
-                    {feature.desc}
-                  </p>
-                </motion.div>
-              );
-            })}
-          </div>
-        </motion.div>
+        {/* Pillars grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          {PILLARS.map((p, i) => {
+            const Icon = p.icon;
+            return (
+              <motion.div
+                key={p.title}
+                initial={{ opacity: 0, y: 40 }}
+                animate={isInView ? { opacity: 1, y: 0 } : {}}
+                transition={{ duration: 0.6, delay: i * 0.12 }}
+                className="relative rounded-3xl border border-white/10 bg-white/5 backdrop-blur-sm p-8 hover:bg-white/10 transition-colors duration-400 group"
+              >
+                <div
+                  className="w-12 h-12 rounded-2xl flex items-center justify-center mb-6 transition-transform duration-300 group-hover:scale-110"
+                  style={{ background: `${p.color}55`, border: `1px solid ${p.color}88` }}
+                >
+                  <Icon size={22} className="text-white" strokeWidth={1.5} />
+                </div>
+                <div className="text-4xl font-bold mb-1 editorial-font">{p.stat}</div>
+                <div className="text-[10px] uppercase tracking-widest text-white/40 font-semibold mb-5">{p.statLabel}</div>
+                <h3 className="text-lg font-semibold mb-3">{p.title}</h3>
+                <p className="text-white/50 font-light text-sm leading-relaxed">{p.desc}</p>
+              </motion.div>
+            );
+          })}
+        </div>
       </div>
     </section>
   );
 };
+
 export default TrustSection;

@@ -4,6 +4,7 @@ import { CartProvider } from "@/context/CartContext";
 import "./globals.css";
 import Script from "next/script";
 import AuthModal from "@/components/AuthModal";
+import CartDrawer from "@/components/CartDrawer";
 import { Suspense } from "react";
 
 const inter = Inter({
@@ -37,9 +38,11 @@ export default function RootLayout({
           <Suspense fallback={null}>
             <AuthModal />
           </Suspense>
+          <CartDrawer />
           <Script src="https://accounts.google.com/gsi/client" strategy="afterInteractive" />
         </CartProvider>
       </body>
     </html>
   );
 }
+

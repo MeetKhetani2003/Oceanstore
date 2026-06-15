@@ -4,16 +4,18 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useCart } from '@/context/CartContext';
+import { motion, AnimatePresence } from 'framer-motion';
 import { 
   User, 
   ShoppingBag, 
   MapPin, 
-  Calendar, 
   Download, 
-  ChevronRight,
-  ShieldAlert,
+  ChevronDown,
+  ChevronUp,
   ArrowRight,
-  LogOut 
+  LogOut,
+  Phone,
+  Calendar
 } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
@@ -25,6 +27,7 @@ export default function ProfilePage() {
   const [orders, setOrders] = useState<any[]>([]);
   const [addresses, setAddresses] = useState<any[]>([]);
   const [loadingOrders, setLoadingOrders] = useState(true);
+  const [expandedOrderId, setExpandedOrderId] = useState<string | null>(null);
 
   useEffect(() => {
     if (!user) return;
@@ -62,7 +65,7 @@ export default function ProfilePage() {
 
   const handleLogout = async () => {
     await logout();
-    router.push('/login');
+    router.push('/shop');
   };
 
   const [showAddForm, setShowAddForm] = useState(false);
@@ -138,6 +141,10 @@ export default function ProfilePage() {
     }
   };
 
+  const toggleExpandOrder = (id: string) => {
+    setExpandedOrderId(prev => (prev === id ? null : id));
+  };
+
   if (!user) {
     return (
       <div className="min-h-screen bg-warm-white flex flex-col justify-center items-center font-sans">
@@ -151,98 +158,169 @@ export default function ProfilePage() {
       <Navbar />
 
       <main className="flex-grow pt-32 pb-24 max-w-[1400px] w-full mx-auto px-6 md:px-12">
-        <div className="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6">
+        <div className="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-subtle-gray/40 pb-8">
           <div>
             <p className="text-xs uppercase tracking-widest text-gray-400 font-semibold mb-2">Customer Account</p>
             <h1 className="editorial-font text-5xl md:text-6xl text-charcoal">{user.name}</h1>
           </div>
           <button 
             onClick={handleLogout}
-            className="flex items-center space-x-2 text-sm text-red-500 hover:text-red-600 transition-colors"
+            className="flex items-center space-x-2 text-xs font-bold uppercase tracking-widest text-red-500 hover:text-red-600 transition-colors cursor-pointer"
           >
-            <LogOut size={16} />
+            <LogOut size={14} />
             <span>Sign Out</span>
           </button>
         </div>
 
         {/* Dashboard grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
           
           {/* Navigation Sidebar */}
-          <div className="lg:col-span-3 space-y-1 bg-white border border-subtle-gray rounded-2xl p-4 shadow-sm">
+          <div className="lg:col-span-3 space-y-1 bg-white border border-subtle-gray/50 rounded-3xl p-4 shadow-xs">
             {[
               { id: 'orders', label: 'Order History', icon: ShoppingBag },
               { id: 'addresses', label: 'Saved Addresses', icon: MapPin },
               { id: 'info', label: 'Personal Details', icon: User }
             ].map(tab => {
               const Icon = tab.icon;
+              const isActive = activeTab === tab.id;
               return (
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id as any)}
-                  className={`w-full flex items-center space-x-3 text-xs py-3 px-4 rounded-xl transition-all duration-200 cursor-pointer ${activeTab === tab.id ? 'bg-ocean-blue text-white font-medium shadow-sm' : 'text-gray-600 hover:bg-subtle-gray/40'}`}
+                  className={`w-full flex items-center space-x-3 text-xs font-semibold uppercase tracking-wider py-3.5 px-4.5 rounded-xl transition-all duration-200 cursor-pointer relative ${
+                    isActive ? 'text-white font-bold' : 'text-gray-500 hover:bg-subtle-gray/30'
+                  }`}
                 >
-                  <Icon size={16} />
-                  <span>{tab.label}</span>
+                  {isActive && (
+                    <motion.div
+                      layoutId="active-tab-bubble"
+                      className="absolute inset-0 bg-accent-green rounded-xl z-0"
+                      transition={{ type: 'spring', stiffness: 380, damping: 30 }}
+                    />
+                  )}
+                  <Icon size={14} className="relative z-10" />
+                  <span className="relative z-10">{tab.label}</span>
                 </button>
               );
             })}
           </div>
 
           {/* Right Panels */}
-          <div className="lg:col-span-9 bg-white border border-subtle-gray rounded-2xl p-8 shadow-sm min-h-[400px]">
+          <div className="lg:col-span-9 bg-white border border-subtle-gray/50 rounded-3xl p-6 md:p-8 shadow-xs min-h-[400px]">
             
             {/* 1. ORDER HISTORY */}
             {activeTab === 'orders' && (
               <div className="space-y-6">
-                <h2 className="text-lg font-semibold text-charcoal border-b border-subtle-gray pb-4">Past Purchases</h2>
+                <h2 className="text-base font-semibold text-charcoal border-b border-subtle-gray/40 pb-4">Past Purchases</h2>
                 
                 {loadingOrders ? (
-                  <p className="text-gray-400 text-sm font-light">Loading orders...</p>
+                  <p className="text-gray-400 text-xs font-light">Loading orders...</p>
                 ) : orders.length === 0 ? (
                   <div className="text-center py-12 text-gray-400 font-light space-y-4">
-                    <p>You haven&apos;t placed any orders yet.</p>
-                    <Link href="/shop" className="inline-flex items-center space-x-2 text-xs font-semibold text-accent-green hover:underline">
+                    <p className="text-xs">You haven&apos;t placed any orders yet.</p>
+                    <Link href="/shop" className="inline-flex items-center space-x-2 text-xs font-bold uppercase tracking-wider text-accent-green hover:underline">
                       <span>Browse Store</span>
-                      <ArrowRight size={14} />
+                      <ArrowRight size={12} />
                     </Link>
                   </div>
                 ) : (
-                  <div className="space-y-6">
-                    {orders.map(o => (
-                      <div key={o._id} className="border border-subtle-gray rounded-2xl p-6 flex flex-col md:flex-row md:items-center justify-between gap-6 hover:border-charcoal/30 transition-colors">
-                        <div className="space-y-1">
-                          <div className="flex items-center space-x-2.5">
-                            <span className="font-semibold text-charcoal">#${o._id.substring(0, 8).toUpperCase()}</span>
-                            <span className={`text-[10px] uppercase font-bold px-2 py-0.5 rounded-full ${o.status === 'PAID' || o.status === 'DELIVERED' ? 'bg-green-50 text-green-700' : 'bg-amber-50 text-amber-700'}`}>
-                              {o.status}
-                            </span>
-                          </div>
-                          <p className="text-xs text-gray-400 font-light">{new Date(o.createdAt).toLocaleDateString()}</p>
-                          <p className="text-xs text-gray-500">{o.items.length} items • INR {parseFloat(o.total).toFixed(2)}</p>
-                        </div>
-
-                        <div className="flex gap-4">
-                          {o.invoiceFileId && (
-                            <a
-                              href={`/api/files/${o.invoiceFileId}`}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="text-xs font-semibold border border-subtle-gray hover:bg-subtle-gray/40 text-charcoal py-2.5 px-4 rounded-full flex items-center space-x-2"
-                            >
-                              <Download size={14} />
-                              <span>Invoice</span>
-                            </a>
-                          )}
-                          <Link
-                            href={`/checkout/success/${o._id}`}
-                            className="text-xs font-semibold bg-accent-green hover:bg-[#153b20] text-white py-2.5 px-4 rounded-full flex items-center space-x-2"
+                  <div className="space-y-4">
+                    {orders.map(o => {
+                      const isExpanded = expandedOrderId === o._id;
+                      return (
+                        <div 
+                          key={o._id} 
+                          className="border border-subtle-gray/50 rounded-2xl overflow-hidden hover:border-charcoal/20 transition-all bg-white"
+                        >
+                          {/* Order Header Summary Row */}
+                          <div 
+                            onClick={() => toggleExpandOrder(o._id)}
+                            className="p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 cursor-pointer hover:bg-warm-white/10 transition-colors"
                           >
-                            <span>Receipt</span>
-                          </Link>
+                            <div className="space-y-1">
+                              <div className="flex items-center space-x-2.5">
+                                <span className="text-xs font-bold text-charcoal">#${o._id.substring(0, 8).toUpperCase()}</span>
+                                <span className={`text-[9px] uppercase font-bold px-2 py-0.5 rounded-full ${o.status === 'PAID' || o.status === 'DELIVERED' ? 'bg-green-50 text-green-700' : 'bg-amber-50 text-amber-700'}`}>
+                                  {o.status}
+                                </span>
+                              </div>
+                              <p className="text-[10px] text-gray-400 font-light">{new Date(o.createdAt).toLocaleDateString()} at {new Date(o.createdAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</p>
+                            </div>
+
+                            <div className="flex items-center space-x-6">
+                              <div className="text-right">
+                                <p className="text-xs font-bold text-charcoal">INR {parseFloat(o.total).toFixed(0)}</p>
+                                <p className="text-[9px] text-gray-400 font-light">{o.items.length} unique items</p>
+                              </div>
+                              <div className="text-gray-400">
+                                {isExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Expanded Items List Container */}
+                          <AnimatePresence>
+                            {isExpanded && (
+                              <motion.div
+                                initial={{ height: 0, opacity: 0 }}
+                                animate={{ height: 'auto', opacity: 1 }}
+                                exit={{ height: 0, opacity: 0 }}
+                                transition={{ duration: 0.25, ease: 'easeInOut' }}
+                                className="border-t border-subtle-gray/40 bg-warm-white/20 p-5 space-y-4"
+                              >
+                                <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1">Items Purchased</p>
+                                <div className="space-y-3">
+                                  {o.items.map((item: any, idx: number) => {
+                                    const prod = item.productId;
+                                    if (!prod) return null;
+                                    const image = prod.images?.[0] ? `/images/${prod.images[0]}.png` : '/images/avocado.png';
+                                    return (
+                                      <div key={idx} className="flex items-center justify-between text-xs bg-white border border-subtle-gray/30 p-2.5 rounded-xl">
+                                        <div className="flex items-center space-x-3">
+                                          <div className="w-10 h-10 bg-warm-white border border-subtle-gray/30 rounded-lg p-1 flex items-center justify-center flex-shrink-0">
+                                            <img src={image} alt={prod.name} className="w-full h-full object-contain mix-blend-multiply" />
+                                          </div>
+                                          <div>
+                                            <h4 className="font-semibold text-charcoal">{prod.name}</h4>
+                                            <p className="text-[9px] text-gray-400 font-light">{prod.brand} • INR {prod.price}</p>
+                                          </div>
+                                        </div>
+                                        <div className="text-right">
+                                          <span className="font-bold text-charcoal">INR {(parseFloat(prod.price) * item.quantity).toFixed(0)}</span>
+                                          <p className="text-[9px] text-gray-400 font-light">Qty: {item.quantity}</p>
+                                        </div>
+                                      </div>
+                                    );
+                                  })}
+                                </div>
+
+                                {/* Actions in Expanded details */}
+                                <div className="pt-4 flex justify-end gap-3 border-t border-subtle-gray/40 mt-4">
+                                  {o.invoiceFileId && (
+                                    <a
+                                      href={`/api/files/${o.invoiceFileId}`}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="text-[10px] font-bold uppercase tracking-wider border border-subtle-gray hover:bg-subtle-gray/40 text-charcoal py-2 px-4 rounded-full flex items-center space-x-1.5"
+                                    >
+                                      <Download size={12} />
+                                      <span>Invoice PDF</span>
+                                    </a>
+                                  )}
+                                  <Link
+                                    href={`/checkout/success/${o._id}`}
+                                    className="text-[10px] font-bold uppercase tracking-wider bg-accent-green hover:bg-[#153b20] text-white py-2 px-4.5 rounded-full flex items-center space-x-1"
+                                  >
+                                    <span>Receipt</span>
+                                  </Link>
+                                </div>
+                              </motion.div>
+                            )}
+                          </AnimatePresence>
                         </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 )}
               </div>
@@ -251,36 +329,36 @@ export default function ProfilePage() {
             {/* 2. SAVED ADDRESSES */}
             {activeTab === 'addresses' && (
               <div className="space-y-6">
-                <div className="flex justify-between items-center border-b border-subtle-gray pb-4">
-                  <h2 className="text-lg font-semibold text-charcoal">Your Addresses</h2>
+                <div className="flex justify-between items-center border-b border-subtle-gray/40 pb-4">
+                  <h2 className="text-base font-semibold text-charcoal">Your Addresses</h2>
                   {!showAddForm && (
                     <button
                       onClick={handleOpenAddForm}
-                      className="text-xs font-semibold bg-accent-green hover:bg-[#153b20] text-white py-2 px-4 rounded-full cursor-pointer transition-colors"
+                      className="text-[10px] font-bold uppercase tracking-widest bg-accent-green hover:bg-[#153b20] text-white py-2 px-4 rounded-full cursor-pointer transition-colors"
                     >
-                      + Add New Address
+                      + Add Address
                     </button>
                   )}
                 </div>
 
                 {showAddForm && (
-                  <form onSubmit={handleSaveAddress} className="border border-subtle-gray rounded-2xl p-6 bg-warm-white/20 space-y-4 max-w-xl">
-                    <h3 className="text-sm font-semibold text-charcoal mb-2">New Delivery Address</h3>
+                  <form onSubmit={handleSaveAddress} className="border border-subtle-gray/50 rounded-2xl p-6 bg-warm-white/10 space-y-4 max-w-xl">
+                    <h3 className="text-xs font-bold text-charcoal uppercase tracking-widest mb-2">New Delivery Address</h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div className="flex flex-col space-y-1">
-                        <label htmlFor="addrName" className="text-[10px] font-semibold text-gray-400 uppercase">Receiver Full Name</label>
+                        <label htmlFor="addrName" className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Receiver Full Name</label>
                         <input
                           type="text"
                           id="addrName"
                           name="name"
                           value={newAddress.name}
                           onChange={handleAddressChange}
-                          className="bg-white border border-subtle-gray rounded-lg p-2.5 text-xs outline-none focus:border-charcoal transition-colors"
+                          className="bg-white border border-subtle-gray/60 rounded-lg p-2.5 text-xs text-charcoal outline-none focus:border-charcoal transition-colors"
                         />
-                        {addressErrors.name && <span className="text-[10px] text-red-500 font-medium">{addressErrors.name}</span>}
+                        {addressErrors.name && <span className="text-[9px] text-red-500 font-semibold">{addressErrors.name}</span>}
                       </div>
                       <div className="flex flex-col space-y-1">
-                        <label htmlFor="addrPhone" className="text-[10px] font-semibold text-gray-400 uppercase">WhatsApp / Contact Phone</label>
+                        <label htmlFor="addrPhone" className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">WhatsApp / Contact Phone</label>
                         <input
                           type="text"
                           id="addrPhone"
@@ -288,12 +366,12 @@ export default function ProfilePage() {
                           value={newAddress.phone}
                           onChange={handleAddressChange}
                           placeholder="+91 XXXXX XXXXX"
-                          className="bg-white border border-subtle-gray rounded-lg p-2.5 text-xs outline-none focus:border-charcoal transition-colors"
+                          className="bg-white border border-subtle-gray/60 rounded-lg p-2.5 text-xs text-charcoal outline-none focus:border-charcoal transition-colors"
                         />
                       </div>
                     </div>
                     <div className="flex flex-col space-y-1">
-                      <label htmlFor="addrStreet" className="text-[10px] font-semibold text-gray-400 uppercase">Street Address</label>
+                      <label htmlFor="addrStreet" className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Street Address</label>
                       <input
                         type="text"
                         id="addrStreet"
@@ -301,46 +379,46 @@ export default function ProfilePage() {
                         value={newAddress.street}
                         onChange={handleAddressChange}
                         placeholder="Flat/House No, Colony, Sector"
-                        className="bg-white border border-subtle-gray rounded-lg p-2.5 text-xs outline-none focus:border-charcoal transition-colors"
+                        className="bg-white border border-subtle-gray/60 rounded-lg p-2.5 text-xs text-charcoal outline-none focus:border-charcoal transition-colors"
                       />
-                      {addressErrors.street && <span className="text-[10px] text-red-500 font-medium">{addressErrors.street}</span>}
+                      {addressErrors.street && <span className="text-[9px] text-red-500 font-semibold">{addressErrors.street}</span>}
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                       <div className="flex flex-col space-y-1">
-                        <label htmlFor="addrCity" className="text-[10px] font-semibold text-gray-400 uppercase">City</label>
+                        <label htmlFor="addrCity" className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">City</label>
                         <input
                           type="text"
                           id="addrCity"
                           name="city"
                           value={newAddress.city}
                           onChange={handleAddressChange}
-                          className="bg-white border border-subtle-gray rounded-lg p-2.5 text-xs outline-none focus:border-charcoal transition-colors"
+                          className="bg-white border border-subtle-gray/60 rounded-lg p-2.5 text-xs text-charcoal outline-none focus:border-charcoal transition-colors"
                         />
-                        {addressErrors.city && <span className="text-[10px] text-red-500 font-medium">{addressErrors.city}</span>}
+                        {addressErrors.city && <span className="text-[9px] text-red-500 font-semibold">{addressErrors.city}</span>}
                       </div>
                       <div className="flex flex-col space-y-1">
-                        <label htmlFor="addrState" className="text-[10px] font-semibold text-gray-400 uppercase">State</label>
+                        <label htmlFor="addrState" className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">State</label>
                         <input
                           type="text"
                           id="addrState"
                           name="state"
                           value={newAddress.state}
                           onChange={handleAddressChange}
-                          className="bg-white border border-subtle-gray rounded-lg p-2.5 text-xs outline-none focus:border-charcoal transition-colors"
+                          className="bg-white border border-subtle-gray/60 rounded-lg p-2.5 text-xs text-charcoal outline-none focus:border-charcoal transition-colors"
                         />
-                        {addressErrors.state && <span className="text-[10px] text-red-500 font-medium">{addressErrors.state}</span>}
+                        {addressErrors.state && <span className="text-[9px] text-red-500 font-semibold">{addressErrors.state}</span>}
                       </div>
                       <div className="flex flex-col space-y-1">
-                        <label htmlFor="addrZip" className="text-[10px] font-semibold text-gray-400 uppercase">ZIP Code</label>
+                        <label htmlFor="addrZip" className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">ZIP Code</label>
                         <input
                           type="text"
                           id="addrZip"
                           name="zipCode"
                           value={newAddress.zipCode}
                           onChange={handleAddressChange}
-                          className="bg-white border border-subtle-gray rounded-lg p-2.5 text-xs outline-none focus:border-charcoal transition-colors"
+                          className="bg-white border border-subtle-gray/60 rounded-lg p-2.5 text-xs text-charcoal outline-none focus:border-charcoal transition-colors"
                         />
-                        {addressErrors.zipCode && <span className="text-[10px] text-red-500 font-medium">{addressErrors.zipCode}</span>}
+                        {addressErrors.zipCode && <span className="text-[9px] text-red-500 font-semibold">{addressErrors.zipCode}</span>}
                       </div>
                     </div>
                     <div className="pt-4 flex space-x-3 justify-end text-xs">
@@ -363,23 +441,26 @@ export default function ProfilePage() {
                 )}
 
                 {addresses.length === 0 ? (
-                  <p className="text-gray-400 text-sm font-light">No saved addresses found. Addresses are automatically saved on checkout or can be added using the button above.</p>
+                  <p className="text-gray-400 text-xs font-light leading-relaxed">No saved addresses found. Addresses are automatically saved on checkout or can be added using the button above.</p>
                 ) : (
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {addresses.map((addr, idx) => (
-                      <div key={idx} className="border border-subtle-gray rounded-2xl p-5 relative bg-warm-white/40 flex flex-col justify-between">
+                      <div key={idx} className="border border-subtle-gray/50 rounded-2xl p-5 relative bg-warm-white/20 hover:border-charcoal/20 transition-all flex flex-col justify-between">
                         <div>
-                          <h3 className="font-semibold text-charcoal mb-1 flex items-center space-x-2 text-sm">
-                            <MapPin size={14} className="text-accent-green" />
+                          <h3 className="font-semibold text-charcoal mb-1 flex items-center space-x-2 text-xs">
+                            <MapPin size={13} className="text-accent-green" />
                             <span>Address {idx + 1}</span>
-                            {addr.name && <span className="text-xs text-gray-400 font-light">• {addr.name}</span>}
+                            {addr.name && <span className="text-[10px] text-gray-400 font-light">• {addr.name}</span>}
                           </h3>
-                          <p className="text-xs text-gray-500 leading-relaxed font-light mt-2">
+                          <p className="text-xs text-gray-500 leading-relaxed font-light mt-3">
                             {addr.street}, {addr.city}, {addr.state} - {addr.zipCode}
                           </p>
                         </div>
                         {addr.phone && (
-                          <p className="text-[10px] text-gray-400 font-light mt-3">Phone: {addr.phone}</p>
+                          <div className="flex items-center space-x-2 text-[10px] text-gray-400 mt-4 pt-3 border-t border-subtle-gray/30">
+                            <Phone size={10} />
+                            <span>{addr.phone}</span>
+                          </div>
                         )}
                       </div>
                     ))}
@@ -391,19 +472,19 @@ export default function ProfilePage() {
             {/* 3. PERSONAL INFORMATION */}
             {activeTab === 'info' && (
               <div className="space-y-6">
-                <h2 className="text-lg font-semibold text-charcoal border-b border-subtle-gray pb-4">Personal Details</h2>
-                <div className="space-y-4 max-w-md">
+                <h2 className="text-base font-semibold text-charcoal border-b border-subtle-gray pb-4">Personal Details</h2>
+                <div className="space-y-6 max-w-md">
                   <div className="flex flex-col space-y-1">
-                    <span className="text-[10px] font-semibold text-gray-400 tracking-wider uppercase">Name</span>
-                    <span className="text-charcoal font-medium">{user.name}</span>
+                    <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Name</span>
+                    <span className="text-charcoal font-semibold text-sm">{user.name}</span>
                   </div>
                   <div className="flex flex-col space-y-1">
-                    <span className="text-[10px] font-semibold text-gray-400 tracking-wider uppercase">Email Address</span>
-                    <span className="text-charcoal font-medium">{user.email}</span>
+                    <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Email Address</span>
+                    <span className="text-charcoal font-semibold text-sm">{user.email}</span>
                   </div>
                   <div className="flex flex-col space-y-1">
-                    <span className="text-[10px] font-semibold text-gray-400 tracking-wider uppercase">Access Role</span>
-                    <span className="text-charcoal font-medium text-xs font-semibold bg-subtle-gray/60 px-2 py-0.5 rounded-full uppercase w-max">
+                    <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Access Role</span>
+                    <span className="text-charcoal text-[10px] font-bold tracking-widest uppercase bg-subtle-gray/60 px-3 py-1 rounded-full w-max mt-1">
                       {user.role}
                     </span>
                   </div>
