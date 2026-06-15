@@ -86,8 +86,8 @@ export function Header() {
             onClick={openSearch}
             className="flex w-full items-center gap-3 rounded-xl border border-line bg-sand px-4 py-2.5 text-left text-muted/70 transition-all duration-200 hover:border-gray-300 hover:bg-white hover:shadow-sm"
           >
-            <Search className="h-4.5 w-4.5 text-muted/60" />
-            <span className="text-[13.5px] font-normal">
+            <Search className="h-4.5 w-4.5 shrink-0 text-muted/60" />
+            <span className="text-[13.5px] font-normal truncate">
               Search for "fresh milk", "farm eggs", "wheat bread" ...
             </span>
           </button>
