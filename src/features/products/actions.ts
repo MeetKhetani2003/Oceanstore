@@ -157,3 +157,56 @@ export async function getProductsAction() {
     return { success: false, products: [] };
   }
 }
+
+export async function getProductBySlug(slug: string) {
+  try {
+    await connectDB();
+    await seedDatabase();
+
+    const p = await Product.findOne({ slug, published: true }).populate('category');
+    if (!p) return { success: false, product: null, related: [] };
+
+    // Store populated category info before converting
+    const categoryName = (p.category as any)?.name || '';
+    const categorySlug = (p.category as any)?.slug || '';
+
+    // Related products: same category ObjectId, exclude self, limit 4
+    const related = await Product.find({
+      category: (p.category as any)._id,
+      _id: { $ne: p._id },
+      published: true,
+    })
+      .limit(4)
+      .populate('category')
+      .lean();
+
+    const mapProduct = (prod: any, catName?: string, catSlug?: string) => ({
+      id: prod._id.toString(),
+      name: prod.name,
+      slug: prod.slug,
+      sku: prod.sku,
+      description: prod.description,
+      shortDescription: prod.shortDescription || '',
+      price: prod.price.toString(),
+      salePrice: prod.salePrice != null ? prod.salePrice.toString() : null,
+      brand: prod.brand || 'OCEON',
+      category: catName ?? (typeof prod.category === 'object' && prod.category?.name ? prod.category.name : ''),
+      categorySlug: catSlug ?? (typeof prod.category === 'object' && prod.category?.slug ? prod.category.slug : ''),
+      images: (prod.images || []).map((img: string) => `/images/${img}.png`),
+      image: prod.images?.[0] ? `/images/${prod.images[0]}.png` : '/images/avocado.png',
+      tags: prod.tags || [],
+      stock: prod.stock,
+      featured: prod.featured ?? false,
+    });
+
+    return {
+      success: true,
+      product: mapProduct(p.toObject(), categoryName, categorySlug),
+      related: related.map((r) => mapProduct(r)),
+    };
+  } catch (error) {
+    console.error('getProductBySlug error:', error);
+    return { success: false, product: null, related: [] };
+  }
+}
+
